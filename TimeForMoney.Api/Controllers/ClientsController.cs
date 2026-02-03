@@ -1,9 +1,9 @@
+namespace TimeForMoney.Api.Controllers;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TimeForMoney.Api.Data;
 using TimeForMoney.Api.Models;
-
-namespace TimeForMoney.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

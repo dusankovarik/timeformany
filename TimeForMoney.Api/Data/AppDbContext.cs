@@ -10,4 +10,5 @@ public class AppDbContext : DbContext {
     public DbSet<Session> Sessions { get; set; } = null!;
     public DbSet<Payment> Payments { get; set; } = null!;
     public DbSet<SessionPayment> SessionPayments { get; set; } = null!;
+    public DbSet<Contact> Contacts { get; set; } = null!;
 }

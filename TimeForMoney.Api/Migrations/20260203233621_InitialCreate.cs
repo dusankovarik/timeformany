@@ -19,8 +19,6 @@ namespace TimeForMoney.Api.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     FirstName = table.Column<string>(type: "TEXT", nullable: false),
                     LastName = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: true),
-                    Phone = table.Column<string>(type: "TEXT", nullable: true),
                     HourlyRate = table.Column<decimal>(type: "TEXT", nullable: false),
                     StartDate = table.Column<DateOnly>(type: "TEXT", nullable: true),
                     AcquisitionSource = table.Column<string>(type: "TEXT", nullable: true),
@@ -30,6 +28,28 @@ namespace TimeForMoney.Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Clients", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Contacts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ClientId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    Value = table.Column<string>(type: "TEXT", nullable: false),
+                    Note = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Contacts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Contacts_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -63,9 +83,12 @@ namespace TimeForMoney.Api.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Date = table.Column<DateOnly>(type: "TEXT", nullable: false),
                     StartTime = table.Column<TimeOnly>(type: "TEXT", nullable: false),
-                    ClientId = table.Column<int>(type: "INTEGER", nullable: false),
                     Duration = table.Column<decimal>(type: "TEXT", nullable: false),
+                    ClientId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Format = table.Column<int>(type: "INTEGER", nullable: false),
                     HourlyRate = table.Column<decimal>(type: "TEXT", nullable: false),
+                    TravelFee = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Adjustment = table.Column<decimal>(type: "TEXT", nullable: false),
                     Topic = table.Column<string>(type: "TEXT", nullable: true),
                     Note = table.Column<string>(type: "TEXT", nullable: true)
                 },
@@ -108,6 +131,11 @@ namespace TimeForMoney.Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Contacts_ClientId",
+                table: "Contacts",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Payments_ClientId",
                 table: "Payments",
                 column: "ClientId");
@@ -131,6 +159,9 @@ namespace TimeForMoney.Api.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Contacts");
+
             migrationBuilder.DropTable(
                 name: "SessionPayments");
 

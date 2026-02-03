@@ -26,9 +26,6 @@ namespace TimeForMoney.Api.Migrations
                     b.Property<string>("AcquisitionSource")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Email")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -43,9 +40,6 @@ namespace TimeForMoney.Api.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Phone")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateOnly?>("StartDate")
                         .HasColumnType("TEXT");
 
@@ -55,6 +49,32 @@ namespace TimeForMoney.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Clients");
+                });
+
+            modelBuilder.Entity("TimeForMoney.Api.Models.Contact", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("Contacts");
                 });
 
             modelBuilder.Entity("TimeForMoney.Api.Models.Payment", b =>
@@ -91,6 +111,9 @@ namespace TimeForMoney.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<decimal>("Adjustment")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("ClientId")
                         .HasColumnType("INTEGER");
 
@@ -99,6 +122,9 @@ namespace TimeForMoney.Api.Migrations
 
                     b.Property<decimal>("Duration")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Format")
+                        .HasColumnType("INTEGER");
 
                     b.Property<decimal>("HourlyRate")
                         .HasColumnType("TEXT");
@@ -110,6 +136,9 @@ namespace TimeForMoney.Api.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Topic")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("TravelFee")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -141,6 +170,17 @@ namespace TimeForMoney.Api.Migrations
                     b.HasIndex("SessionId");
 
                     b.ToTable("SessionPayments");
+                });
+
+            modelBuilder.Entity("TimeForMoney.Api.Models.Contact", b =>
+                {
+                    b.HasOne("TimeForMoney.Api.Models.Client", "Client")
+                        .WithMany("Contacts")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("TimeForMoney.Api.Models.Payment", b =>
@@ -182,6 +222,11 @@ namespace TimeForMoney.Api.Migrations
                     b.Navigation("Payment");
 
                     b.Navigation("Session");
+                });
+
+            modelBuilder.Entity("TimeForMoney.Api.Models.Client", b =>
+                {
+                    b.Navigation("Contacts");
                 });
 #pragma warning restore 612, 618
         }
