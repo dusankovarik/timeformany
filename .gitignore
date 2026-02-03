@@ -1,0 +1,43 @@
+# =====================
+# .NET
+# =====================
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.pdb
+*.db
+
+# SQLite database
+*.db
+*.db-shm
+*.db-wal
+
+# =====================
+# Visual Studio / VS Code / Cursor
+# =====================
+.vs/
+.vscode/
+.idea/
+*.code-workspace
+
+# =====================
+# Node / React / Vite
+# =====================
+node_modules/
+dist/
+build/
+.vite/
+
+# =====================
+# Logs
+# =====================
+*.log
+
+# =====================
+# OS
+# =====================
+.DS_Store
+Thumbs.db
