@@ -8,5 +8,4 @@ public class Client {
     public string? AcquisitionSource { get; set; }
     public ClientStatus Status { get; set; } = ClientStatus.Active;
     public string? Note { get; set; }
-    public List<Contact> Contacts { get; set; } = new();
 }
