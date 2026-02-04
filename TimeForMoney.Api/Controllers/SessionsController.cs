@@ -31,4 +31,18 @@ public class SessionsController : ControllerBase {
 
         return session;
     }
+
+    // POST: api/sessions
+    [HttpPost]
+    public async Task<ActionResult<Session>> PostSession(Session session) {
+        if (!await _context.Clients.AnyAsync(c => c.Id == session.ClientId)) {
+            return BadRequest($"Klient s ID {session.ClientId} neexistuje.");
+        }
+
+        _context.Sessions.Add(session);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetSession), new { id = session.Id }, session);
+    }
+
 }

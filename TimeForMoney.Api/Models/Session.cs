@@ -6,7 +6,7 @@ public class Session {
     public TimeOnly StartTime { get; set; }
     public decimal Duration { get; set; }
     public int ClientId { get; set; }
-    public Client Client { get; set; } = null!;
+    public Client? Client { get; set; }
     public SessionFormat Format { get; set; } = SessionFormat.Online;
     public decimal HourlyRate { get; set; }
     public decimal TravelFee { get; set; } = 0;
