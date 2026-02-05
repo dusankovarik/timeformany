@@ -22,7 +22,7 @@ public class ClientsController : ControllerBase {
 
     // GET: api/clients/1
     [HttpGet("{id}")]
-    public async Task<ActionResult<Client>> GetClient(int id) {
+    public async Task<ActionResult<Client>> GetClient([FromRoute] int id) {
         var client = await _context.Clients.FindAsync(id);
 
         if (client == null) {
@@ -34,7 +34,7 @@ public class ClientsController : ControllerBase {
 
     // POST: api/clients
     [HttpPost]
-    public async Task<ActionResult<Client>> PostClient(Client client) {
+    public async Task<ActionResult<Client>> PostClient([FromBody] Client client) {
         _context.Clients.Add(client);
         await _context.SaveChangesAsync();
 
@@ -43,7 +43,7 @@ public class ClientsController : ControllerBase {
 
     // PUT: api/clients/1
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutClient(int id, Client client) {
+    public async Task<IActionResult> PutClient([FromRoute] int id, [FromBody] Client client) {
         if (id != client.Id) {
             return BadRequest("ID in URL does not match ID in request body.");
         }
@@ -63,7 +63,7 @@ public class ClientsController : ControllerBase {
 
     // DELETE: api/clients/1
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteClient(int id) {
+    public async Task<IActionResult> DeleteClient([FromRoute] int id) {
         var client = await _context.Clients.FindAsync(id);
 
         if (client == null) {

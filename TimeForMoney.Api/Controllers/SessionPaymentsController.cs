@@ -15,11 +15,25 @@ public class SessionPaymentsController : ControllerBase {
 
     // GET: api/session-payments/session/1/status
     [HttpGet("session/{sessionId}/status")]
-    public async Task<ActionResult<SessionPaymentStatusDto>> GetSessionPaymentStatus(int sessionId) {
+    public async Task<ActionResult<SessionPaymentStatusDto>> GetSessionPaymentStatus(
+        [FromRoute] int sessionId) {
         var result = await _service.GetSessionPaymentStatusAsync(sessionId);
 
         if (result == null) {
             return NotFound($"Session with ID {sessionId} was not found.");
+        }
+
+        return Ok(result);
+    }
+
+    // POST: api/session-payments/assign
+    [HttpPost("assign")]
+    public async Task<ActionResult<AssignPaymentResponseDto>> AssignPaymentToSessions(
+        [FromBody] AssignPaymentRequestDto request) {
+        var result = await _service.AssignPaymentToSessionsAsync(request);
+
+        if (!result.Success) {
+            return BadRequest(result);
         }
 
         return Ok(result);

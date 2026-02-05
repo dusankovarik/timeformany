@@ -22,7 +22,7 @@ public class PaymentsController : ControllerBase {
 
     // GET: api/payments/1
     [HttpGet("{id}")]
-    public async Task<ActionResult<Payment>> GetPayment(int id) {
+    public async Task<ActionResult<Payment>> GetPayment([FromRoute] int id) {
         var payment = await _context.Payments.Include(p => p.Client).FirstOrDefaultAsync(p => p.Id == id);
 
         if (payment == null) {
@@ -34,7 +34,7 @@ public class PaymentsController : ControllerBase {
 
     // POST: api/payments
     [HttpPost]
-    public async Task<ActionResult<Payment>> PostPayment(Payment payment) {
+    public async Task<ActionResult<Payment>> PostPayment([FromBody] Payment payment) {
         if (!await _context.Clients.AnyAsync(c => c.Id == payment.ClientId)) {
             return BadRequest($"Client with ID {payment.ClientId} does not exist.");
         }
@@ -51,7 +51,7 @@ public class PaymentsController : ControllerBase {
 
     // PUT: api/payments/1
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutPayment(int id, Payment payment) {
+    public async Task<IActionResult> PutPayment([FromRoute] int id, [FromBody] Payment payment) {
         if (id != payment.Id) {
             return BadRequest("ID in URL does not match ID in request body.");
         }
@@ -76,7 +76,7 @@ public class PaymentsController : ControllerBase {
 
     // DELETE: api/payments/1
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeletePayment(int id) {
+    public async Task<IActionResult> DeletePayment([FromRoute] int id) {
         var payment = await _context.Payments.FindAsync(id);
 
         if (payment == null) {

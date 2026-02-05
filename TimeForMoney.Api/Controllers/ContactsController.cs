@@ -22,7 +22,7 @@ public class ContactsController : ControllerBase {
 
     // GET: api/contacts/1
     [HttpGet("{id}")]
-    public async Task<ActionResult<Contact>> GetContact(int id) {
+    public async Task<ActionResult<Contact>> GetContact([FromRoute] int id) {
         var contact = await _context.Contacts.Include(c => c.Client).FirstOrDefaultAsync(c => c.Id == id);
 
         if (contact == null) {
@@ -34,7 +34,7 @@ public class ContactsController : ControllerBase {
 
     // POST: api/contacts
     [HttpPost]
-    public async Task<ActionResult<Contact>> PostContact(Contact contact) {
+    public async Task<ActionResult<Contact>> PostContact([FromBody] Contact contact) {
         if (!await _context.Clients.AnyAsync(c => c.Id == contact.ClientId)) {
             return BadRequest($"Client with ID {contact.ClientId} does not exist.");
         }
@@ -51,7 +51,7 @@ public class ContactsController : ControllerBase {
 
     // PUT: api/contacts/1
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutContact(int id, Contact contact) {
+    public async Task<IActionResult> PutContact([FromRoute] int id, [FromBody] Contact contact) {
         if (id != contact.Id) {
             return BadRequest("ID in URL does not match ID in request body.");
         }
@@ -76,7 +76,7 @@ public class ContactsController : ControllerBase {
 
     // DELETE: api/contacts/1
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteContact(int id) {
+    public async Task<IActionResult> DeleteContact([FromRoute] int id) {
         var contact = await _context.Contacts.FindAsync(id);
 
         if (contact == null) {

@@ -22,7 +22,7 @@ public class SessionsController : ControllerBase {
 
     // GET: api/sessions/1
     [HttpGet("{id}")]
-    public async Task<ActionResult<Session>> GetSession(int id) {
+    public async Task<ActionResult<Session>> GetSession([FromRoute] int id) {
         var session = await _context.Sessions.Include(s => s.Client).FirstOrDefaultAsync(s => s.Id == id);
 
         if (session == null) {
@@ -34,7 +34,7 @@ public class SessionsController : ControllerBase {
 
     // POST: api/sessions
     [HttpPost]
-    public async Task<ActionResult<Session>> PostSession(Session session) {
+    public async Task<ActionResult<Session>> PostSession([FromBody] Session session) {
         if (!await _context.Clients.AnyAsync(c => c.Id == session.ClientId)) {
             return BadRequest($"Client with ID {session.ClientId} does not exist.");
         }
@@ -51,7 +51,7 @@ public class SessionsController : ControllerBase {
 
     // PUT: api/sessions/1
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutSession(int id, Session session) {
+    public async Task<IActionResult> PutSession([FromRoute] int id, [FromBody] Session session) {
         if (id != session.Id) {
             return BadRequest("ID in URL does not match ID in request body.");
         }
@@ -76,7 +76,7 @@ public class SessionsController : ControllerBase {
 
     // DELETE: api/sessions/1
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteSession(int id) {
+    public async Task<IActionResult> DeleteSession([FromRoute] int id) {
         var session = await _context.Sessions.FindAsync(id);
 
         if (session == null) {
