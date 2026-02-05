@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TimeForMoney.Api.Data;
-using Swashbuckle.AspNetCore;
+using TimeForMoney.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +18,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+builder.Services.AddScoped<ISessionPaymentService, SessionPaymentService>();
 
 
 var app = builder.Build();
