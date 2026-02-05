@@ -26,7 +26,7 @@ public class ContactsController : ControllerBase {
         var contact = await _context.Contacts.Include(c => c.Client).FirstOrDefaultAsync(c => c.Id == id);
 
         if (contact == null) {
-            return NotFound();
+            return NotFound("Contact with this ID was not found.");
         }
 
         return contact;
@@ -36,7 +36,7 @@ public class ContactsController : ControllerBase {
     [HttpPost]
     public async Task<ActionResult<Contact>> PostContact(Contact contact) {
         if (!await _context.Clients.AnyAsync(c => c.Id == contact.ClientId)) {
-            return BadRequest($"Klient s ID {contact.ClientId} neexistuje.");
+            return BadRequest($"Client with ID {contact.ClientId} does not exist.");
         }
 
         _context.Contacts.Add(contact);
@@ -53,11 +53,11 @@ public class ContactsController : ControllerBase {
     [HttpPut("{id}")]
     public async Task<IActionResult> PutContact(int id, Contact contact) {
         if (id != contact.Id) {
-            return BadRequest("ID v URL neodpovídá ID v těle požadavku.");
+            return BadRequest("ID in URL does not match ID in request body.");
         }
         
         if (!await _context.Clients.AnyAsync(c => c.Id == contact.ClientId)) {
-            return BadRequest($"Klient s ID {contact.ClientId} neexistuje.");
+            return BadRequest($"Client with ID {contact.ClientId} does not exist.");
         }
 
         _context.Entry(contact).State = EntityState.Modified;
@@ -66,7 +66,7 @@ public class ContactsController : ControllerBase {
             await _context.SaveChangesAsync();
         } catch (DbUpdateConcurrencyException) {
             if (!await _context.Contacts.AnyAsync(c => c.Id == id)) {
-                return NotFound();
+                return NotFound("Contact with this ID was not found.");
             }
             throw;
         }
@@ -80,7 +80,7 @@ public class ContactsController : ControllerBase {
         var contact = await _context.Contacts.FindAsync(id);
 
         if (contact == null) {
-            return NotFound();
+            return NotFound("Contact with this ID was not found.");
         }
 
         _context.Contacts.Remove(contact);

@@ -26,7 +26,7 @@ public class ClientsController : ControllerBase {
         var client = await _context.Clients.FindAsync(id);
 
         if (client == null) {
-            return NotFound();
+            return NotFound("Client with this ID was not found.");
         }
 
         return client;
@@ -45,7 +45,7 @@ public class ClientsController : ControllerBase {
     [HttpPut("{id}")]
     public async Task<IActionResult> PutClient(int id, Client client) {
         if (id != client.Id) {
-            return BadRequest("ID v URL neodpovídá ID v těle požadavku.");
+            return BadRequest("ID in URL does not match ID in request body.");
         }
 
         _context.Entry(client).State = EntityState.Modified;
@@ -54,7 +54,7 @@ public class ClientsController : ControllerBase {
             await _context.SaveChangesAsync();
         } catch (DbUpdateConcurrencyException) {
             if (!await _context.Clients.AnyAsync(c => c.Id == id)) {
-                return NotFound("Klient s tímto ID nebyl nalezen.");
+                return NotFound("Client with this ID was not found.");
             }
             throw;
         }
@@ -67,7 +67,7 @@ public class ClientsController : ControllerBase {
         var client = await _context.Clients.FindAsync(id);
 
         if (client == null) {
-            return NotFound("Klient s tímto ID nebyl nalezen.");
+            return NotFound("Client with this ID was not found.");
         }
 
         _context.Clients.Remove(client);

@@ -26,7 +26,7 @@ public class SessionsController : ControllerBase {
         var session = await _context.Sessions.Include(s => s.Client).FirstOrDefaultAsync(s => s.Id == id);
 
         if (session == null) {
-            return NotFound();
+            return NotFound("Session with this ID was not found.");
         }
 
         return session;
@@ -36,7 +36,7 @@ public class SessionsController : ControllerBase {
     [HttpPost]
     public async Task<ActionResult<Session>> PostSession(Session session) {
         if (!await _context.Clients.AnyAsync(c => c.Id == session.ClientId)) {
-            return BadRequest($"Klient s ID {session.ClientId} neexistuje.");
+            return BadRequest($"Client with ID {session.ClientId} does not exist.");
         }
 
         _context.Sessions.Add(session);
@@ -53,11 +53,11 @@ public class SessionsController : ControllerBase {
     [HttpPut("{id}")]
     public async Task<IActionResult> PutSession(int id, Session session) {
         if (id != session.Id) {
-            return BadRequest("ID v URL neodpovídá ID v těle požadavku.");
+            return BadRequest("ID in URL does not match ID in request body.");
         }
 
         if (!await _context.Clients.AnyAsync(c => c.Id == session.ClientId)) {
-            return BadRequest($"Klient s ID {session.ClientId} neexistuje.");
+            return BadRequest($"Client with ID {session.ClientId} does not exist.");
         }
 
         _context.Entry(session).State = EntityState.Modified;
@@ -66,7 +66,7 @@ public class SessionsController : ControllerBase {
             await _context.SaveChangesAsync();
         } catch (DbUpdateConcurrencyException) {
             if (!await _context.Sessions.AnyAsync(s => s.Id == id)) {
-                return NotFound();
+                return NotFound("Session with this ID was not found.");
             }
             throw;
         }
@@ -80,7 +80,7 @@ public class SessionsController : ControllerBase {
         var session = await _context.Sessions.FindAsync(id);
 
         if (session == null) {
-            return NotFound();
+            return NotFound("Session with this ID was not found.");
         }
 
         _context.Sessions.Remove(session);

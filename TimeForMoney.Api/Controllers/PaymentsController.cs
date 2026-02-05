@@ -26,7 +26,7 @@ public class PaymentsController : ControllerBase {
         var payment = await _context.Payments.Include(p => p.Client).FirstOrDefaultAsync(p => p.Id == id);
 
         if (payment == null) {
-            return NotFound();
+            return NotFound("Payment with this ID was not found.");
         }
 
         return payment;
@@ -36,7 +36,7 @@ public class PaymentsController : ControllerBase {
     [HttpPost]
     public async Task<ActionResult<Payment>> PostPayment(Payment payment) {
         if (!await _context.Clients.AnyAsync(c => c.Id == payment.ClientId)) {
-            return BadRequest($"Klient s ID {payment.ClientId} neexistuje.");
+            return BadRequest($"Client with ID {payment.ClientId} does not exist.");
         }
 
         _context.Payments.Add(payment);
@@ -53,11 +53,11 @@ public class PaymentsController : ControllerBase {
     [HttpPut("{id}")]
     public async Task<IActionResult> PutPayment(int id, Payment payment) {
         if (id != payment.Id) {
-            return BadRequest("ID v URL neodpovídá ID v těle požadavku.");
+            return BadRequest("ID in URL does not match ID in request body.");
         }
 
         if (!await _context.Clients.AnyAsync(c => c.Id == payment.ClientId)) {
-            return BadRequest($"Klient s ID {payment.ClientId} neexistuje.");
+            return BadRequest($"Client with ID {payment.ClientId} does not exist.");
         }
 
         _context.Entry(payment).State = EntityState.Modified;
@@ -66,7 +66,7 @@ public class PaymentsController : ControllerBase {
             await _context.SaveChangesAsync();
         } catch (DbUpdateConcurrencyException) {
             if (!await _context.Payments.AnyAsync(p => p.Id == id)) {
-                return NotFound();
+                return NotFound("Payment with this ID was not found.");
             }
             throw;
         }
@@ -80,7 +80,7 @@ public class PaymentsController : ControllerBase {
         var payment = await _context.Payments.FindAsync(id);
 
         if (payment == null) {
-            return NotFound();
+            return NotFound("Payment with this ID was not found.");
         }
 
         _context.Payments.Remove(payment);

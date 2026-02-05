@@ -19,7 +19,7 @@ public class SessionPaymentsController : ControllerBase {
         var result = await _service.GetSessionPaymentStatusAsync(sessionId);
 
         if (result == null) {
-            return NotFound($"Session s ID {sessionId} neexistuje.");
+            return NotFound($"Session with ID {sessionId} was not found.");
         }
 
         return Ok(result);
