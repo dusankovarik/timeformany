@@ -127,4 +127,59 @@ public class SessionPaymentService : ISessionPaymentService {
             AssignedSessionsCount = request.Assignments.Count
         };
     }
+
+    public async Task<ClientBalanceDto?> GetClientBalanceAsync(int clientId) {
+        // VALIDATE: Check if client exists
+        var client = await _context.Clients.FindAsync(clientId);
+        if (client == null) {
+            return null;
+        }
+        
+        // ACTION: Read all sessions for the client
+        var sessions = await _context.Sessions
+            .Where(s => s.ClientId == clientId)
+            .ToListAsync();
+        
+        // ACTION: Calculate total sessions price
+        var totalSessionsPrice = sessions.Sum(s => s.HourlyRate * s.Duration + s.TravelFee + s.Adjustment);
+        
+        // ACTION: Calculate total paid amount (sum of all payments from this client)
+        var totalPaidAmount = await _context.Payments
+            .Where(p => p.ClientId == clientId)
+            .SumAsync(p => p.Amount);
+        
+        // ACTION: Calculate remaining balance (positive = credit, negative = debt)
+        var balance = totalPaidAmount - totalSessionsPrice;
+
+        // ACTION: Calculate, how many sessions are paid and how many are unpaid
+        var paidSessionsCount = 0;
+        var unpaidSessionsCount = 0;
+
+        foreach (var session in sessions) {
+            var sessionPrice = session.HourlyRate * session.Duration
+                + session.TravelFee + session.Adjustment;
+
+            var paidAmount = await _context.SessionPayments
+                .Where(sp => sp.SessionId == session.Id)
+                .SumAsync(sp => sp.Amount);
+
+            if (paidAmount >= sessionPrice) {
+                paidSessionsCount++;
+            } else {
+                unpaidSessionsCount++;
+            }
+        }
+
+        // RESPONSE: Create and return DTO
+        return new ClientBalanceDto {
+            ClientId = clientId,
+            ClientFullName = $"{client.FirstName} {client.LastName}",
+            TotalSessionsPrice = totalSessionsPrice,
+            TotalPaidAmount = totalPaidAmount,
+            Balance = balance,
+            TotalSessionsCount = sessions.Count,
+            PaidSessionsCount = paidSessionsCount,
+            UnpaidSessionsCount = unpaidSessionsCount
+        };
+    }
 }
