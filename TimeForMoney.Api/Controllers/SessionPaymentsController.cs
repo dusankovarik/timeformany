@@ -38,17 +38,4 @@ public class SessionPaymentsController : ControllerBase {
 
         return Ok(result);
     }
-
-    // GET: api/session-payments/client/1/balance
-    [HttpGet("client/{clientId}/balance")]
-    public async Task<ActionResult<ClientBalanceDto>> GetClientBalance(
-        [FromRoute] int clientId) {
-        var result = await _service.GetClientBalanceAsync(clientId);
-
-        if (result == null) {
-            return NotFound($"Client with ID {clientId} was not found.");
-        }
-
-        return Ok(result);
-    }
 }

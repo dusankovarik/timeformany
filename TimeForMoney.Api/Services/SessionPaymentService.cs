@@ -13,38 +13,38 @@ public class SessionPaymentService : ISessionPaymentService {
     }
 
     public async Task<SessionPaymentStatusDto?> GetSessionPaymentStatusAsync(int sessionId) {
-        // VALIDATE: Check if session exists
+        // Check if session exists
         var session = await _context.Sessions.FindAsync(sessionId);
         if (session == null) {
             return null;
         }
 
-        // ACTION: Calculate session price
+        // Calculate session price
         var sessionPrice = (session.HourlyRate * session.Duration)
             + session.TravelFee
             + session.Adjustment;
 
-        // ACTION: Calculate paid amount
+        // Calculate paid amount
         var paidAmount = await _context.SessionPayments
             .Where(sp => sp.SessionId == sessionId)
             .SumAsync(sp => sp.Amount);
 
-        // ACTION: Calculate remaining amount
+        // Calculate remaining amount
         var remainingAmount = sessionPrice - paidAmount;
 
-        // RESPONSE: Create and return DTO
+        // Return DTO
         return new SessionPaymentStatusDto {
             SessionId = sessionId,
             SessionPrice = sessionPrice,
             PaidAmount = paidAmount,
             RemainingAmount = remainingAmount,
-            IsPaid = remainingAmount <= 0,
+            IsPaid = remainingAmount <= 0
         };
     }
 
     public async Task<AssignPaymentResponseDto> AssignPaymentToSessionsAsync(
         AssignPaymentRequestDto request) {
-        // VALIDATE: Check if payment exists
+        // Check if payment exists
         var payment = await _context.Payments.FindAsync(request.PaymentId);
         if (payment == null) {
             return new AssignPaymentResponseDto {
@@ -53,7 +53,7 @@ public class SessionPaymentService : ISessionPaymentService {
             };
         }
 
-        // VALIDATE: Check if there are any assignments
+        // Check if there are any assignments
         if (!request.Assignments.Any()) {
             return new AssignPaymentResponseDto {
                 Success = false,
@@ -61,7 +61,7 @@ public class SessionPaymentService : ISessionPaymentService {
             };
         }
 
-        // VALIDATE: Check if all sessions exist
+        // Check if all sessions exist
         var sessionIds = request.Assignments.Select(a => a.SessionId).ToList();
         var sessions = await _context.Sessions
             .Where(s => sessionIds.Contains(s.Id))
@@ -75,7 +75,7 @@ public class SessionPaymentService : ISessionPaymentService {
             };
         }
 
-        // VALIDATE: Check if all sessions belong to the same client as the payment
+        // Check if all sessions belong to the same client as the payment
         if (sessions.Any(s => s.ClientId != payment.ClientId)) {
             var wrongSessions = sessions.Where(s => s.ClientId != payment.ClientId)
                                     .Select(s => s.Id);
@@ -86,15 +86,15 @@ public class SessionPaymentService : ISessionPaymentService {
             };
         }
 
-        // VALIDATE: Calculate the already assigned amount from this payment
+        // Calculate the already assigned amount from this payment
         var alreadyAssigned = await _context.SessionPayments
             .Where(sp => sp.PaymentId == request.PaymentId)
             .SumAsync(sp => sp.Amount);
 
-        // VALIDATE: Calculate the new assigned amount
+        // Calculate the new assigned amount
         var newAssignments = request.Assignments.Sum(a => a.Amount);
 
-        // VALIDATE: Check if we exceed the payment amount
+        // Check if we exceed the payment amount
         var totalAssigned = alreadyAssigned + newAssignments;
         if (totalAssigned > payment.Amount) {
             var remaining = payment.Amount - alreadyAssigned;
@@ -105,7 +105,7 @@ public class SessionPaymentService : ISessionPaymentService {
             };
         }
 
-        // ACTION: Create SessionPayment records
+        // Create SessionPayment records
         foreach (var assignment in request.Assignments) {
             var sessionPayment = new SessionPayment {
                 SessionId = assignment.SessionId,
@@ -115,71 +115,16 @@ public class SessionPaymentService : ISessionPaymentService {
             _context.SessionPayments.Add(sessionPayment);
         }
 
-        // ACTION: Save to database
+        // Save to database
         await _context.SaveChangesAsync();
 
-        // RESPONSE: Return successful response
+        // Return successful response
         return new AssignPaymentResponseDto {
             Success = true,
             Message = $"Payment successfully assigned to {request.Assignments.Count} session(s).",
             TotalAssignedAmount = newAssignments,
             RemainingPaymentAmount = payment.Amount - totalAssigned,
             AssignedSessionsCount = request.Assignments.Count
-        };
-    }
-
-    public async Task<ClientBalanceDto?> GetClientBalanceAsync(int clientId) {
-        // VALIDATE: Check if client exists
-        var client = await _context.Clients.FindAsync(clientId);
-        if (client == null) {
-            return null;
-        }
-        
-        // ACTION: Read all sessions for the client
-        var sessions = await _context.Sessions
-            .Where(s => s.ClientId == clientId)
-            .ToListAsync();
-        
-        // ACTION: Calculate total sessions price
-        var totalSessionsPrice = sessions.Sum(s => s.HourlyRate * s.Duration + s.TravelFee + s.Adjustment);
-        
-        // ACTION: Calculate total paid amount (sum of all payments from this client)
-        var totalPaidAmount = await _context.Payments
-            .Where(p => p.ClientId == clientId)
-            .SumAsync(p => p.Amount);
-        
-        // ACTION: Calculate remaining balance (positive = credit, negative = debt)
-        var balance = totalPaidAmount - totalSessionsPrice;
-
-        // ACTION: Calculate, how many sessions are paid and how many are unpaid
-        var paidSessionsCount = 0;
-        var unpaidSessionsCount = 0;
-
-        foreach (var session in sessions) {
-            var sessionPrice = session.HourlyRate * session.Duration
-                + session.TravelFee + session.Adjustment;
-
-            var paidAmount = await _context.SessionPayments
-                .Where(sp => sp.SessionId == session.Id)
-                .SumAsync(sp => sp.Amount);
-
-            if (paidAmount >= sessionPrice) {
-                paidSessionsCount++;
-            } else {
-                unpaidSessionsCount++;
-            }
-        }
-
-        // RESPONSE: Create and return DTO
-        return new ClientBalanceDto {
-            ClientId = clientId,
-            ClientFullName = $"{client.FirstName} {client.LastName}",
-            TotalSessionsPrice = totalSessionsPrice,
-            TotalPaidAmount = totalPaidAmount,
-            Balance = balance,
-            TotalSessionsCount = sessions.Count,
-            PaidSessionsCount = paidSessionsCount,
-            UnpaidSessionsCount = unpaidSessionsCount
         };
     }
 }
