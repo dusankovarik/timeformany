@@ -20,7 +20,7 @@ public class ReportsController : ControllerBase {
         var result = await _service.GetClientBalanceAsync(clientId);
 
         if (result == null) {
-            return NotFound($"Client with ID {clientId} was not found.");
+            return NotFound($"Client with ID {clientId} does not exist.");
         }
 
         return Ok(result);

@@ -26,7 +26,7 @@ public class ContactsController : ControllerBase {
         var contact = await _context.Contacts.Include(c => c.Client).FirstOrDefaultAsync(c => c.Id == id);
 
         if (contact == null) {
-            return NotFound("Contact with this ID was not found.");
+            return NotFound($"Contact with ID {id} does not exist.");
         }
 
         return contact;
@@ -53,7 +53,7 @@ public class ContactsController : ControllerBase {
     [HttpPut("{id}")]
     public async Task<IActionResult> PutContact([FromRoute] int id, [FromBody] Contact contact) {
         if (id != contact.Id) {
-            return BadRequest("ID in URL does not match ID in request body.");
+            return BadRequest($"ID in URL ({id}) does not match ID in request body ({contact.Id}).");
         }
         
         if (!await _context.Clients.AnyAsync(c => c.Id == contact.ClientId)) {
@@ -66,7 +66,7 @@ public class ContactsController : ControllerBase {
             await _context.SaveChangesAsync();
         } catch (DbUpdateConcurrencyException) {
             if (!await _context.Contacts.AnyAsync(c => c.Id == id)) {
-                return NotFound("Contact with this ID was not found.");
+                return NotFound($"Contact with ID {id} does not exist.");
             }
             throw;
         }
@@ -80,7 +80,7 @@ public class ContactsController : ControllerBase {
         var contact = await _context.Contacts.FindAsync(id);
 
         if (contact == null) {
-            return NotFound("Contact with this ID was not found.");
+            return NotFound($"Contact with ID {id} does not exist.");
         }
 
         _context.Contacts.Remove(contact);

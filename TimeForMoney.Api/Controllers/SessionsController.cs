@@ -26,7 +26,7 @@ public class SessionsController : ControllerBase {
         var session = await _context.Sessions.Include(s => s.Client).FirstOrDefaultAsync(s => s.Id == id);
 
         if (session == null) {
-            return NotFound("Session with this ID was not found.");
+            return NotFound($"Session with ID {id} does not exist.");
         }
 
         return session;
@@ -53,7 +53,7 @@ public class SessionsController : ControllerBase {
     [HttpPut("{id}")]
     public async Task<IActionResult> PutSession([FromRoute] int id, [FromBody] Session session) {
         if (id != session.Id) {
-            return BadRequest("ID in URL does not match ID in request body.");
+            return BadRequest($"ID in URL ({id}) does not match ID in request body ({session.Id}).");
         }
 
         if (!await _context.Clients.AnyAsync(c => c.Id == session.ClientId)) {
@@ -66,7 +66,7 @@ public class SessionsController : ControllerBase {
             await _context.SaveChangesAsync();
         } catch (DbUpdateConcurrencyException) {
             if (!await _context.Sessions.AnyAsync(s => s.Id == id)) {
-                return NotFound("Session with this ID was not found.");
+                return NotFound($"Session with ID {id} does not exist.");
             }
             throw;
         }
@@ -80,7 +80,7 @@ public class SessionsController : ControllerBase {
         var session = await _context.Sessions.FindAsync(id);
 
         if (session == null) {
-            return NotFound("Session with this ID was not found.");
+            return NotFound($"Session with ID {id} does not exist.");
         }
 
         _context.Sessions.Remove(session);

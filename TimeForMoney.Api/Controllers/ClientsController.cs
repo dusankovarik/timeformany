@@ -26,7 +26,7 @@ public class ClientsController : ControllerBase {
         var client = await _context.Clients.FindAsync(id);
 
         if (client == null) {
-            return NotFound("Client with this ID was not found.");
+            return NotFound($"Client with ID {id} does not exist.");
         }
 
         return client;
@@ -45,7 +45,7 @@ public class ClientsController : ControllerBase {
     [HttpPut("{id}")]
     public async Task<IActionResult> PutClient([FromRoute] int id, [FromBody] Client client) {
         if (id != client.Id) {
-            return BadRequest("ID in URL does not match ID in request body.");
+            return BadRequest($"ID in URL ({id}) does not match ID in request body ({client.Id}).");
         }
 
         _context.Entry(client).State = EntityState.Modified;
@@ -54,7 +54,7 @@ public class ClientsController : ControllerBase {
             await _context.SaveChangesAsync();
         } catch (DbUpdateConcurrencyException) {
             if (!await _context.Clients.AnyAsync(c => c.Id == id)) {
-                return NotFound("Client with this ID was not found.");
+                return NotFound($"Client with ID {id} does not exist.");
             }
             throw;
         }
@@ -67,7 +67,7 @@ public class ClientsController : ControllerBase {
         var client = await _context.Clients.FindAsync(id);
 
         if (client == null) {
-            return NotFound("Client with this ID was not found.");
+            return NotFound($"Client with ID {id} does not exist.");
         }
 
         _context.Clients.Remove(client);

@@ -26,7 +26,7 @@ public class PaymentsController : ControllerBase {
         var payment = await _context.Payments.Include(p => p.Client).FirstOrDefaultAsync(p => p.Id == id);
 
         if (payment == null) {
-            return NotFound("Payment with this ID was not found.");
+            return NotFound($"Payment with ID {id} does not exist.");
         }
 
         return payment;
@@ -53,7 +53,7 @@ public class PaymentsController : ControllerBase {
     [HttpPut("{id}")]
     public async Task<IActionResult> PutPayment([FromRoute] int id, [FromBody] Payment payment) {
         if (id != payment.Id) {
-            return BadRequest("ID in URL does not match ID in request body.");
+            return BadRequest($"ID in URL ({id}) does not match ID in request body ({payment.Id}).");
         }
 
         if (!await _context.Clients.AnyAsync(c => c.Id == payment.ClientId)) {
@@ -66,7 +66,7 @@ public class PaymentsController : ControllerBase {
             await _context.SaveChangesAsync();
         } catch (DbUpdateConcurrencyException) {
             if (!await _context.Payments.AnyAsync(p => p.Id == id)) {
-                return NotFound("Payment with this ID was not found.");
+                return NotFound($"Payment with ID {id} does not exist.");
             }
             throw;
         }
@@ -80,7 +80,7 @@ public class PaymentsController : ControllerBase {
         var payment = await _context.Payments.FindAsync(id);
 
         if (payment == null) {
-            return NotFound("Payment with this ID was not found.");
+            return NotFound($"Payment with ID {id} does not exist.");
         }
 
         _context.Payments.Remove(payment);

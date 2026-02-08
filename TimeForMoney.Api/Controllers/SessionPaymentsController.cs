@@ -13,14 +13,26 @@ public class SessionPaymentsController : ControllerBase {
         _service = service;
     }
 
-    // GET: api/session-payments/session/1/status
-    [HttpGet("session/{sessionId}/status")]
-    public async Task<ActionResult<SessionPaymentStatusDto>> GetSessionPaymentStatus(
+    // GET: api/session-payments/session/1/balance
+    [HttpGet("session/{sessionId}/balance")]
+    public async Task<ActionResult<SessionBalanceDto>> GetSessionBalance(
         [FromRoute] int sessionId) {
-        var result = await _service.GetSessionPaymentStatusAsync(sessionId);
+        var result = await _service.GetSessionBalanceAsync(sessionId);
 
         if (result == null) {
-            return NotFound($"Session with ID {sessionId} was not found.");
+            return NotFound($"Session with ID {sessionId} does not exist.");
+        }
+
+        return Ok(result);
+    }
+
+    // GET: api/session-payments/1
+    [HttpGet("{id}")]
+    public async Task<ActionResult<AssignmentDto>> GetAssignment([FromRoute] int id) {
+        var result = await _service.GetAssignmentAsync(id);
+
+        if (result == null) {
+            return NotFound($"Assignment with ID {id} does not exist.");
         }
 
         return Ok(result);
@@ -37,5 +49,31 @@ public class SessionPaymentsController : ControllerBase {
         }
 
         return Ok(result);
+    }
+
+    // PUT: api/session-payments/1
+    [HttpPut("{id}")]
+    public async Task<ActionResult<EditAssignmentResponseDto>> EditAssignment(
+        [FromRoute] int id,
+        [FromBody] EditAssignmentRequestDto request) {
+        var result = await _service.EditAssignmentAsync(id, request);
+
+        if (!result.Success) {
+            return BadRequest(result);
+        }
+
+        return Ok(result);
+    }
+
+    // DELETE: api/session-payments/1
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAssignment([FromRoute] int id) {
+        var deleted = await _service.DeleteAssignmentAsync(id);
+
+        if (!deleted) {
+            return NotFound($"Assignment with ID {id} does not exist.");
+        }
+
+        return NoContent();
     }
 }
